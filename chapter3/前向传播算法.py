@@ -19,5 +19,18 @@ sess = tf.Session()
 sess.run(w1.initializer)
 sess.run(w2.initializer)
 
+print(sess.run(w1))
 print(sess.run(y))
+# 3.95757794
+
+# 可以看到上面的代码中，创建了回话 session ,但是会话的只能运行定义好的运算。
+# 比如 w1.initializer 和 w2.initializer 来给变量赋值。
+# 一个个赋值固然可行，但是当变量数目增多，或者变量间存在依赖关系，单个调用就比较麻烦。
+# 可以使用更加便捷的方式来完成变量初始化的过程。
+init_op = tf.global_variables_initializer()
+sess.run(init_op)
+
+print(sess.run(y))
+# 0.40506378
+
 sess.close()
