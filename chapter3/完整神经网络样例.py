@@ -20,7 +20,11 @@ a = tf.matmul(x,w1)
 y = tf.matmul(a,w2)
 
 # 定义损失函数和反向传播算法
+# 定义损失函数来刻画预测值与真实值之间的差距
 cross_entropy = -tf.reduce_mean(y_ * tf.log(tf.clip_by_value(y,1e-10,1.0)))
+
+# 定义反向传播法来优化神经网络中的参数
+# 0.001 是学习率
 train_step = tf.train.AdamOptimizer(0.001).minimize(cross_entropy)
 
 # 通过随机数生成一个模拟数据集
@@ -55,5 +59,6 @@ with tf.Session() as sess:
       # 每隔一段时间计算所有数据的交叉熵
       total_cross_entropy = sess.run(cross_entropy,feed_dict={x:X,y_:Y})
       print("After %d training step(s), cross entropy on all data is %g" % (i, total_cross_entropy))
-      print("w1:", sess.run(w1))
-      print("w2:", sess.run(w2))
+
+  print("w1:", sess.run(w1))
+  print("w2:", sess.run(w2))

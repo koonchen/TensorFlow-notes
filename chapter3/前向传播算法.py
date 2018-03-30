@@ -19,7 +19,6 @@ sess = tf.Session()
 sess.run(w1.initializer)
 sess.run(w2.initializer)
 
-print(sess.run(w1))
 print(sess.run(y))
 # 3.95757794
 
