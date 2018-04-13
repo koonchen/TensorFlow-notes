@@ -9,6 +9,8 @@
 import tensorflow as tf
 STEPS = 10
 x = tf.Variable(tf.constant(5, dtype=tf.float32), name="x")
+
+# 损失函数
 y = tf.square(x)
 
 train_op = tf.train.GradientDescentOptimizer(1).minimize(y)
