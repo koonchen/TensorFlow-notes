@@ -11,6 +11,8 @@ STEPS = 100
 global_step = tf.Variable(0)
 
 # 通过 exponential_decay 函数生成学习率。
+# 每1轮，学习率乘以0.96
+# staircase 默认为 False 代表曲线， Ture 表示梯度
 learning_rate = tf.train.exponential_decay(0.1,global_step,1,0.96,staircase=True)
 
 x = tf.Variable(tf.constant(5, dtype=tf.float32), name="x")
