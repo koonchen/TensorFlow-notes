@@ -25,6 +25,7 @@ cross_entropy = -tf.reduce_mean(y_ * tf.log(tf.clip_by_value(y,1e-10,1.0)))
 
 # 定义反向传播法来优化神经网络中的参数
 # 0.001 是学习率
+# 反向传播
 train_step = tf.train.AdamOptimizer(0.001).minimize(cross_entropy)
 
 # 通过随机数生成一个模拟数据集

@@ -10,9 +10,9 @@ import tensorflow as tf
 STEPS = 10
 x = tf.Variable(tf.constant(5, dtype=tf.float32), name="x")
 
-# 损失函数
+# 损失函数 loss
 y = tf.square(x)
-
+# 反向传播 train_step
 train_op = tf.train.GradientDescentOptimizer(1).minimize(y)
 
 with tf.Session() as sess:

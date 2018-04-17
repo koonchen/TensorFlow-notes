@@ -23,7 +23,7 @@ y = tf.square(x)
 learning_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(y,global_step=global_step)
 
 with tf.Session() as sess:
-  sess.run(tf.global_variables_initializer())
+  tf.global_variables_initializer().run()
   for i in range(STEPS):
     sess.run(learning_step)
     if i % 10 == 9:
@@ -31,3 +31,4 @@ with tf.Session() as sess:
       x_value = sess.run(x)
       print("After %s iteration(s): x%s is %f, learning rate is %f."% 
         (i+1, i+1, x_value, LEARNING_RATE_value))
+      print("global_step", global_step.eval())

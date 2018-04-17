@@ -18,6 +18,7 @@ loss_less = 10
 loss_more = 1
 loss = tf.reduce_sum(tf.where(tf.greater(y,y_),(y-y_)*loss_more,(y_-y)*loss_less))
 
+# 反向传播
 train_step = tf.train.AdamOptimizer(0.001).minimize(loss)
 
 # 通过随机数生成一个模拟数据集
@@ -39,7 +40,6 @@ with tf.Session() as sess:
 		start = (i*batch_size)%dataset_size
 		end = min(start+batch_size,dataset_size)
 		sess.run(train_step,feed_dict={x:X[start:end],y_:Y[start:end]})
-		result = sess.run(w1)
 		if i % 1000 == 0:
 			print("After %d training step(s), w1 is: " % (i))
 			print(sess.run(w1), "\n")
