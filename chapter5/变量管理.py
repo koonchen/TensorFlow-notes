@@ -39,7 +39,7 @@ with tf.variable_scope("root"):
 # 这个命名空间作为前缀。所以 tf.variable_scope 函数除了控制 tf.get_variable 执行的功能之外，这个函数也提供了一个
 # 管理变量命名空间的方式，以下代码显示了如何通过 tf.variable_scope 来管理变量的名称。
 v1 = tf.get_variable("v", [1])
-print(v1,name)
+print(v1.name)
 # 输出 v:0, "v"为变量的名称，":0"表示这个变量是生成变量这个运算的第一个结果。
 
 with tf.variable_scope("foo"):
@@ -57,3 +57,11 @@ with tf.variable_scope("foo"):
   v4 = tf.get_variable("v1", [1])
   print(v4.name)
   # 输出 foo/v1:0 当命名空间退出之后，变量名称也就不会再加入其前缀了。
+
+# 创建一个名称为空的命名空间，并设置 reuse=True。
+with tf.variable_scope("", reuse=True):
+  v5 = tf.get_variable("foo/bar/v", [1])
+  # 可以直接通过命名空间名称的变量名来获取其他命名空间下的变量。比如这里获取的内容。
+  print(v5==v3)
+  v6 = tf.get_variable("foo/v1", [1])
+  print(v6==v4)
