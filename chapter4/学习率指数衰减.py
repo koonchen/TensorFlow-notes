@@ -25,6 +25,9 @@ learning_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(y,glob
 with tf.Session() as sess:
   tf.global_variables_initializer().run()
   for i in range(STEPS):
+    # 测试
+    # print("test:",global_step.eval())
+    # 测试完成
     sess.run(learning_step)
     if i % 10 == 9:
       LEARNING_RATE_value = sess.run(learning_rate)
