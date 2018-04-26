@@ -12,6 +12,11 @@
 # 使用滑动平均使结果更健壮。
 
 # 一套完整的鸡蛋饼，就完成了。
+'''
+  可扩展性不好，代码大量冗余。
+  没有持久化模型，无法再次使用。
+  所以这套鸡蛋饼只卖3块...
+'''
 
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
