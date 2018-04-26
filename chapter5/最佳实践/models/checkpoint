@@ -1,6 +1,0 @@
-model_checkpoint_path: "model.ckpt-19001"
-all_model_checkpoint_paths: "model.ckpt-15001"
-all_model_checkpoint_paths: "model.ckpt-16001"
-all_model_checkpoint_paths: "model.ckpt-17001"
-all_model_checkpoint_paths: "model.ckpt-18001"
-all_model_checkpoint_paths: "model.ckpt-19001"
