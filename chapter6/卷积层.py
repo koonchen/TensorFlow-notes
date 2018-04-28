@@ -31,14 +31,15 @@ biases = tf.get_variable(
 # tf.nn.conv2d 提供了一个非常方便的函数来实现卷积层前向传播的算法。这个函数的第一个输入为当前层的节点矩阵。
 # 注意这个矩阵是一个四维的矩阵，后面三个维度对应一个节点矩阵，第一维对应一个输入 batch 。比如在输入侧，
 # input[0, :, :, :] 表示第一章图片， input[1, :, :, :] 表示第二张图片，以此类推。
+# input 的内容是四维的，分别代表：batch、height、width、channels
 # tf.nn.conv2d 的第二个参数提供了卷积层的权重，第三个参数为不同维度上的步长。
 # 虽然第三个参数提供的是一个长度为 4 的数组，但是第一维和最后一维的数字要求一定是1。这是因为卷积层的步长
-# 只对常和宽有效。最后一个参数是填充的方法， TensorFlow 中提供 SAME 或是 VALID 两种选择。其中 SAME 表示
+# 只对长和宽有效。最后一个参数是填充的方法， TensorFlow 中提供 SAME 或是 VALID 两种选择。其中 SAME 表示
 # 添加全0填充，VALID 表示不添加。
 conv = tf.nn.conv2d(
   input, # 输入图片， [0, :, :, :] 代表第一张图片
   filter_weight, # 代表权重
-  strides=[1, 1, 1, 1], # 在不同维度上的步长
+  strides=[1, 1, 1, 1], # 在不同维度上的步长，对应 input
   padding = 'SAME' # 填充 0
 )
 
