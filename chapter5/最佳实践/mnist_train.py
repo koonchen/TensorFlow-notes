@@ -6,7 +6,6 @@
 # When I wrote this, only God and I understood what I was doing. Now, God only knows.
 
 # 神经网络训练
-import os
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 
