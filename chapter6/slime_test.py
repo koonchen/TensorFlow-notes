@@ -58,4 +58,5 @@ with slim.arg_scope([sliml.con2d, slim.max_pool2d, slim.avg_pool2d], stride=1 ,p
       branch_3 = slim.avg_pool2d(net, [3, 3], scope='AvgPool_0a_3x3')
       branch_3 = slim.conv2d(branch_3, 192, [1, 1], scope='Conv2d_0a_1x1')
     # 当前 Inception 模块的最后输出是由上面四个计算结果拼接得到的。
+    # 这里的 3 表示在第三维度上进行连接。
     net = tf.concat(3, [branch_0, branch_1, branch_2, branch_3])
