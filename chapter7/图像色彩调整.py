@@ -44,7 +44,3 @@ with tf.Session() as sess:
   cat = np.asarray(result[0].eval(), dtype='uint8')
   plt.imshow(cat)
   plt.show()
-
-
-
-
