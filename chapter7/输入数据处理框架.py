@@ -8,6 +8,7 @@
 import tensorflow as tf
 
 files = tf.train.match_filenames_once("output.tfrecords")
+# 输入文件列表
 filename_queue = tf.train.string_input_producer(files, shuffle=False) 
 # 读取文件。
 reader = tf.TFRecordReader()
@@ -32,6 +33,7 @@ min_after_dequeue = 10000
 batch_size = 100
 capacity = min_after_dequeue + 3 * batch_size
 
+# 样例组合
 image_batch, label_batch = tf.train.shuffle_batch(
   [images, labels], 
   batch_size=batch_size, 
