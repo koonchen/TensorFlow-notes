@@ -14,23 +14,27 @@ HIDDEN_SIZE = 200 # 隐藏层规模
 NUM_LAYERS = 2 # LSTM 的层数
 VOCAB_SIZE = 10000 # 词典规模
 
-LEARNING_RATE = 1.0
-TRAIN_BATCH_SIZE = 20
-TRAIN_NUM_STEP = 35
+LEARNING_RATE = 1.0 # 学习速率
+TRAIN_BATCH_SIZE = 20 # 训练数据 batch 的大小
+TRAIN_NUM_STEP = 35 # 训练数据截断长度
 
-EVAL_BATCH_SIZE = 1
-EVAL_NUM_STEP = 1
-NUM_EPOCH = 2
-KEEP_PROB = 0.5
-MAX_GRAD_NORM = 5
+EVAL_BATCH_SIZE = 1 # 测试数据 batch 的大小
+EVAL_NUM_STEP = 1 # 测试数据截断长度
+NUM_EPOCH = 2 # 使用训练数据的轮数
+KEEP_PROB = 0.5 # 节点不被 dropout 的概率
+MAX_GRAD_NORM = 5 # 用于控制梯度膨胀的参数
 
+# 通过一个 PTBModel 类来描述模型，这样方便维护循环神经网络的状态。
 class PTBModel(object):
   def __init__(self, is_training, batch_size, num_steps):
+    # 记录使用的 batch 大小和截断长度。
     self.batch_size = batch_size
     self.num_steps = num_steps
     
-    # 定义输入层。
+    # 定义输入层。可以看到输入层的维度为 batch_size x num_steps ，这和
+    # ptb_iterator 函数输出的训练数据 batch 是一致的。
     self.input_data = tf.placeholder(tf.int32, [batch_size, num_steps])
+    # 定义预期输出，它的维度和 ptb_iterator 函数输出的正确答案维度也一样。
     self.targets = tf.placeholder(tf.int32, [batch_size, num_steps])
     
     # 定义使用LSTM结构及训练时使用dropout。
@@ -39,25 +43,39 @@ class PTBModel(object):
       lstm_cell = tf.contrib.rnn.DropoutWrapper(lstm_cell, output_keep_prob=KEEP_PROB)
     cell = tf.contrib.rnn.MultiRNNCell([lstm_cell]*NUM_LAYERS)
     
-    # 初始化最初的状态。
+    # 初始化最初的状态，全 0 向量。
     self.initial_state = cell.zero_state(batch_size, tf.float32)
+    # 将单词 ID 转换成单词向量。因为总共有 VOCAB_SIZE 个单词，每个单词向量的维度为
+    # HIDDEN_SIZE ，所以 embedding 参数的维度为 VOCAB_SIZE x HIDDEN_SIZE
     embedding = tf.get_variable("embedding", [VOCAB_SIZE, HIDDEN_SIZE])
     
     # 将原本单词ID转为单词向量。
     inputs = tf.nn.embedding_lookup(embedding, self.input_data)
     
+    # 只在训练中使用 dropout
     if is_training:
       inputs = tf.nn.dropout(inputs, KEEP_PROB)
 
     # 定义输出列表。
+    # 这里先将不同时刻 LSTM 结构的输出收集起来，再通过一个全连接层得到最终的输出。
     outputs = []
+    # state 存储不同 batch 中 LSTM 的状态，将其初始化为 0
     state = self.initial_state
     with tf.variable_scope("RNN"):
       for time_step in range(num_steps):
+        # 在第一个时刻声明结构中的变量，在之后的时刻都需要复用之前定义好的变量。
         if time_step > 0: tf.get_variable_scope().reuse_variables()
+        # 从输入数据中获取当前时刻的输入并传入 LSTM 结构。
         cell_output, state = cell(inputs[:, time_step, :], state)
-        outputs.append(cell_output) 
+        # 将当前输出加入输出队列
+        outputs.append(cell_output)
+
+    # 将队列展开成 [batch, hidden_size*num_steps] 的形状，然后在 reshape 成
+    # [batch*numsteps, hidden_size] 的形状。
     output = tf.reshape(tf.concat(outputs, 1), [-1, HIDDEN_SIZE])
+    # 将从 LSTM 中得到的输出再经过一个全链接层得到最后的预测结果，最终的预测结果
+    # 在每一个时刻上都是一个长度为 VOCAB_SIZE 的数组，经过 softmax 层之后表示下一个位置
+    # 是不同单词的概率。
     weight = tf.get_variable("weight", [HIDDEN_SIZE, VOCAB_SIZE])
     bias = tf.get_variable("bias", [VOCAB_SIZE])
     logits = tf.matmul(output, weight) + bias
@@ -77,9 +95,12 @@ class PTBModel(object):
 
     # 控制梯度大小，定义优化方法和训练步骤。
     grads, _ = tf.clip_by_global_norm(tf.gradients(self.cost, trainable_variables), MAX_GRAD_NORM)
+    # 定义优化方法。
     optimizer = tf.train.GradientDescentOptimizer(LEARNING_RATE)
+    # 训练步骤。
     self.train_op = optimizer.apply_gradients(zip(grads, trainable_variables))
 
+# 使用给定的模型 model 在数据 data 上运行train_op 并返回在全部数据上的 perplexity 值。
 def run_epoch(session, model, data, train_op, output_log, epoch_size):
   total_costs = 0.0
   iters = 0
@@ -88,21 +109,27 @@ def run_epoch(session, model, data, train_op, output_log, epoch_size):
   # 训练一个epoch。
   for step in range(epoch_size):
     x, y = session.run(data)
-    cost, state, _ = session.run([model.cost, model.final_state, train_op],
-                                    {model.input_data: x, model.targets: y, model.initial_state: state})
+    cost, state, _ = session.run(
+      [model.cost, model.final_state, train_op],
+      {model.input_data: x, model.targets: y, model.initial_state: state}
+    )
     total_costs += cost
     iters += model.num_steps
 
+    # 只有在训练时输出日志。
     if output_log and step % 100 == 0:
       print("After %d steps, perplexity is %.3f" % (step, np.exp(total_costs / iters)))
+  # 返回给定模型在给定数据上的 perplexity 值。
   return np.exp(total_costs / iters)
 
 
 def main():
+  # 获取原始数据。
   train_data, valid_data, test_data, _ = reader.ptb_raw_data(DATA_PATH)
 
   # 计算一个epoch需要训练的次数
   train_data_len = len(train_data)
+  # 取整
   train_batch_len = train_data_len // TRAIN_BATCH_SIZE
   train_epoch_size = (train_batch_len - 1) // TRAIN_NUM_STEP
 
