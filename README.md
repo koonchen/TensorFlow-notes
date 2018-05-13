@@ -1,6 +1,6 @@
 # TensorFlow 实战笔记
 
-​	随着第八章结束，我将继续完成我的毕业设计，以及《TensorFlow机器学习项目实战》一书的研读，这里的笔记暂时告一段段落，等待之后将 chapter9、10 完善。
+​	随着第八章结束，我将继续完成我的毕业设计，以及《TensorFlow机器学习项目实战》一书的研读，这里的笔记暂时告一段段落，等待之后将 chapter9(tensorboard)、10(gpu、cpu优化) 完善。
 
 ![tensorflow_book](./images/tensorflow_book.jpg)
 
